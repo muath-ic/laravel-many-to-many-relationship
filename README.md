@@ -329,7 +329,7 @@ class AddRoleIdToUsers extends Migration
     }
 }
 ```
-3. Then run this composer command on your terminal:
+3. Then run this composer command on your terminal after trancate (empty) the users table:
    > php artisan migrate
 4. Then change the `Role.php` and `User.php` models as following:
    So Add to `Role.php` these lines of code:
