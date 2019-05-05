@@ -288,3 +288,74 @@ class LoginController extends Controller{
 ```
 
 ## Then Generating Policies
+To generate the **policies** for user on (Roles and Permissions), we need to tie **User** table to **Roles** table because *a role has more than one permission*.
+So Add the `role_id` to the `users` table as following:
+1. create the `migration` by using the composer command:
+   >php artisan make:migration add_role_id_to_users --table=users
+2. So your migration file `2019_05_05_113256_add_role_id_to_users.php` will be as following:
+```php
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class AddRoleIdToUsers extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->integer('role_id')->unsigned()->after('id');
+            $table->foreign('role_id')->references('id')->on('roles');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign('users_role_id_foreign');
+            $table->dropColumn('role_id');
+        });
+    }
+}
+```
+3. Then run this composer command on your terminal:
+   > php artisan migrate
+4. Then change the `Role.php` and `User.php` models as following:
+   So Add to `Role.php` these lines of code:
+```php
+/**
+     * The Users that the Roles .
+     */
+    public function Users()
+    {
+
+        return $this->hasMany(Users::class);
+
+    } 
+```
+And `User.php` Add these lines of code:
+```php
+/**
+ * The Role that the User has.
+ */
+public function Role()
+{
+
+    return $this->belongsTo(Roles::class);
+
+}
+```
+
+
+## Then Add Localization
