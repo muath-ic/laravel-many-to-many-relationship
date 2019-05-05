@@ -187,3 +187,104 @@ class Role_permissions extends Model
     //
 }
 ```
+
+#Put All Models files on App\Models
+1. create `Models` directory on `App`
+2. move all models to `Models`
+3. Modify all namespace for all models into the new directory as following:
+   form `namespace App;` to `namespace App\Models;`
+4. Modify `config\auth.php` as following:
+   ```php
+   'providers' => [
+        'users' => [
+            'driver' => 'eloquent',
+            // 'model' => App\User::class, // original line
+            'model' => App\Models\User::class, // change to this
+        ],
+   ```
+5. Modify `config\service.php` as following
+   ```php
+   'stripe' => [
+        // 'model' => App\User::class, // original
+        'model' => App\Models\User::class, // change to this
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+    ],
+   ```
+6. So if you want to use User Model you need to change the namespace from `app\User` to `app\Models\User`
+7. In this case we need to change `app\Http\Controllers\Auth\RegisterController.php`
+8. This is a Stack Overflow link:
+   [[https://stackoverflow.com/questions/33975235/how-to-move-the-laravel-5-1-user-model-to-app-models-user]]
+
+# Then Generate Authentication Scaffolding with this Composer Command
+```composer
+php artisan make:auth
+```
+### Controller
+The controller which is used for the authentication process is **HomeController**.
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests;
+use Illuminate\Http\Request;
+
+class HomeController extends Controller{
+   /**
+      * Create a new controller instance.
+      *
+      * @return void
+   */
+   
+   public function __construct() {
+      $this->middleware('auth');
+   }
+   
+   /**
+      * Show the application dashboard.
+      *
+      * @return \Illuminate\Http\Response
+   */
+   
+   public function index() {
+      return view('home');
+   }
+}
+```
+As a result, the scaffold application generated creates the login page and the registration page for performing authentication. They are on 
+*resources\views\auth\\**
+
+### Manually Authenticating Users
+
+Laravel uses the Auth façade which helps in manually authenticating the users. It includes the attempt method to verify their email and password.
+
+Consider the following lines of code for **LoginController** which includes all the functions for authentication
+
+```php
+<?php
+
+// Authentication mechanism
+namespace App\Http\Controllers;
+
+use Illuminate\Support\Facades\Auth;
+
+class LoginController extends Controller{
+   /**
+      * Handling authentication request
+      *
+      * @return Response
+   */
+   
+   public function authenticate() {
+      if (Auth::attempt(['email' => $email, 'password' => $password])) {
+      
+         // Authentication passed...
+         return redirect()->intended('dashboard');
+      }
+   }
+}
+```
+
+## Then Generating Policies
