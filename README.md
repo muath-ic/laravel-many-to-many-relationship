@@ -288,6 +288,7 @@ class LoginController extends Controller{
 ```
 
 ## Then Generating Policies
+for more http://laravel-school.com/posts/an-introduction-to-laravel-policy-15
 To generate the **policies** for user on (Roles and Permissions), we need to tie **User** table to **Roles** table because *a role has more than one permission*.
 So Add the `role_id` to the `users` table as following:
 1. create the `migration` by using the composer command:
